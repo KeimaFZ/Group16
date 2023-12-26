@@ -227,7 +227,7 @@ app.post('/login', async (req, res) => {
  *     summary: Register a new visitor
  *     tags: [Visitor]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

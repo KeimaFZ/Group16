@@ -1,0 +1,81 @@
+// View Visitors
+GET http://localhost:4000/viewvisitor
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThhY2ZlZGM5ZDU3NThmN2I2YWZkMWMiLCJpYXQiOjE3MDM2MDAzMjQsImV4cCI6MTcwMzYwMzkyNH0.VipMHaOI9pHVRQo92OA0sDPQ4B8N1JkRq-r26aWylDs
+
+###
+// Register Admin
+POST http://localhost:4000/registeradmin
+Content-Type: application/json
+
+{
+    "username": "syahirah",
+    "password": 8877
+}
+
+###
+// Admin Login
+POST http://localhost:4000/login
+Content-Type: application/json
+
+{
+    "username": "syahirah",
+    "password": 8877
+}
+
+###
+// Register a Visitor
+POST http://localhost:4000/registervisitor
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThhY2ZlZGM5ZDU3NThmN2I2YWZkMWMiLCJpYXQiOjE3MDM2MDYzMzksImV4cCI6MTcwMzYwOTkzOX0.nkIKU2A5WZcvXGnMSoAsT_U49CW_iVd-9FUvH7HyOmY
+
+{
+    "Name": "keima",
+    "Age": "24",
+    "Gender": "female",
+    "Address": "konoha",
+    "Zipcode": "34000",
+    "Relation": "balik umah"
+}
+
+
+###
+//Admin issue visitor pass
+POST http://localhost:4000/issuevisitorpass
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThhY2ZlZGM5ZDU3NThmN2I2YWZkMWMiLCJpYXQiOjE3MDM2MDYzMzksImV4cCI6MTcwMzYwOTkzOX0.nkIKU2A5WZcvXGnMSoAsT_U49CW_iVd-9FUvH7HyOmY
+
+{
+    "visitorId": "658aa47fb8cd40c4b34204b4",
+    "issuedBy": "syahirah",
+    "validUntil": "2023-12-31T23:59:59"
+}
+
+
+
+
+###
+//Visitor to Retrieve Their Pass          //visitor ID
+GET http://localhost:4000/retrievepass/658aa47fb8cd40c4b34204b4
+
+
+
+###
+// Update Visitor                           //visitor ID
+PATCH http://localhost:4000/updatevisitor/65885309e00fafde3f572263
+Content-Type: application/json         
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTg3OWYzZTc1ZmI1YzkwZTZkMjgyNmQiLCJpYXQiOjE3MDM0MzM0MTQsImV4cCI6MTcwMzQzNzAxNH0.O897xmoyLIZQUvj0W9pl8kkJtMQ-aUi9AUFAWfQ9eDQ
+
+{
+    "Name": "juliana",
+    "Age": "50",
+    "Gender": "female",
+    "Address": "bukit bintang",
+    "Zipcode": "47300",
+    "Relation": "honeymoon"
+}
+
+
+###
+// Delete Visitor                           //visitor ID
+DELETE http://localhost:4000/deletevisitor/6587b6a9df5531ab2ec05054
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTg4NjA5YmUwMGZhZmRlM2Y1NzIyNjgiLCJpYXQiOjE3MDM0MzczNDUsImV4cCI6MTcwMzQ0MDk0NX0.nRpxzf7y4HiNSRo6bMZwjM570hc-HDKv1WXxQH9ACus
