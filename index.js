@@ -119,7 +119,7 @@ client.connect()
 
   // Now you can safely start your server here, after the DB connection is established
   app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on https://group16is.azurewebsites.net/`);
   });
 });
 
