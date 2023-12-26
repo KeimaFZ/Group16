@@ -131,6 +131,18 @@ const admins = [];
 app.use(express.json());
 
 
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+
 /**
  * @swagger
  * /registeradmin:
