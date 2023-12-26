@@ -239,7 +239,7 @@ app.post('/login', async (req, res) => {
  *     summary: Register a new visitor
  *     tags: [Visitor]
  *     security:
- *       - JWT: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
