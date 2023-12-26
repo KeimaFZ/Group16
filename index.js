@@ -6,6 +6,22 @@ const bodyParser = require('body-parser');
 const { ObjectId } = require('mongodb'); // Import ObjectId
 //const port = 4000;
 const port = process.env.PORT || 4000 ;
+//const ejs = require('ejs');
+
+// Set the view engine to EJS
+//app.set('view engine', 'ejs');
+
+// Serve static files from the public directory
+//app.use(express.static(path.join(__dirname, 'public')));
+
+// Route to render the login page
+//app.get('/login', (req, res) => {
+  //res.render('index'); // Renders the 'index.ejs' file inside the 'views' folder
+//});
+
+// Set up middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
 
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
