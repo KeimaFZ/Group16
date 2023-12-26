@@ -504,6 +504,11 @@ app.delete('/deletevisitor/:visitorId', verifyToken, async (req, res) => {
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     Visitor:
  *       type: object
@@ -543,4 +548,3 @@ app.delete('/deletevisitor/:visitorId', verifyToken, async (req, res) => {
  *         Relation:
  *           type: string
  */
-
