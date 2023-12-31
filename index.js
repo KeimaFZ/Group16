@@ -248,6 +248,12 @@ app.post('/login', async (req, res) => {
 });
 
 
+// Existing route in your code
+app.get('/login', (req, res) => {
+  res.render('login'); // This will render login.ejs when /login is accessed
+});
+
+
 /**
  * @swagger
  * /registervisitor:
