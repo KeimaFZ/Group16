@@ -336,21 +336,20 @@ app.get('/login', (req, res) => {
   }
 });
 
+
 /**
  * @swagger
  * /host/login:
  *   post:
- *     summary: Host login
- *     tags: [Host]
+ *     summary: Authenticate a host
+ *     tags:
+ *       - Host
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - username
- *               - password
  *             properties:
  *               username:
  *                 type: string
