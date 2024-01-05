@@ -145,6 +145,7 @@ client.connect()
 // In-memory data storage (replace with a database in production)
 const visitors = [];
 const securities = [];
+const hosts = [];
 
 app.use(express.json());
 
@@ -258,6 +259,56 @@ app.get('/login', (req, res) => {
   res.render('login'); // This will render login.ejs when /login is accessed
 });
 
+
+/**
+ * @swagger
+ * /hosts/register:
+ *   post:
+ *     summary: Register a new host
+ *     tags: [Host]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - location
+ *               - contactInfo
+ *             properties:
+ *               name:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               contactInfo:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Host registered successfully
+ *       401:
+ *         description: Unauthorized, token not provided or invalid
+ *       500:
+ *         description: Error occurred while registering the host
+ */
+
+// Endpoint to register a new host
+app.post('/hosts/register', verifyToken, async (req, res) => {
+  try {
+    // Check if the request has necessary data (name, location, contactInfo)
+    const { name, location, contactInfo } = req.body;
+    if (!name || !location || !contactInfo) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    const result = await db.collection('hosts').insertOne({ name, location, contactInfo });
+    res.status(201).json({ message: 'Host registered successfully' });
+  } catch (error) {
+    console.error('Error registering host:', error);
+    res.status(500).json({ error: 'An error occurred while registering the host' });
+  }
+});
 
 /**
  * @swagger
