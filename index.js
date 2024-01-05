@@ -313,6 +313,7 @@ app.get('/login', (req, res) => {
 
 // Host registration endpoint
 app.post('/host/register', async (req, res) => {
+  const hosts = db.collection('hosts');
   const { username, password, phoneNumber } = req.body;
 
   try {
