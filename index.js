@@ -271,7 +271,7 @@ app.get('/login', (req, res) => {
  * /host/register:
  *   post:
  *     summary: Register a new host
- *     tags: 
+ *     tags:
  *       - Host
  *     requestBody:
  *       required: true
@@ -282,22 +282,15 @@ app.get('/login', (req, res) => {
  *             required:
  *               - username
  *               - password
- *               - contactInfo
+ *               - phoneNumber
  *             properties:
  *               username:
  *                 type: string
  *               password:
  *                 type: string
- *               contactInfo:
- *                 type: object
- *                 properties:
- *                   email:
- *                     type: string
- *                   phone:
- *                     type: string
- *                   address:
- *                     type: string
- *                     # Add more contact info properties as needed
+ *               phoneNumber:
+ *                 type: string
+ *                 description: Phone number of the host
  *     responses:
  *       201:
  *         description: Host registered successfully
@@ -320,7 +313,7 @@ app.get('/login', (req, res) => {
 
 // Host registration endpoint
 app.post('/host/register', async (req, res) => {
-  const { username, password, contactInfo, ...otherData } = req.body;
+  const { username, password, phoneNumber } = req.body;
 
   try {
     // Check if the user already exists
@@ -332,12 +325,11 @@ app.post('/host/register', async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insert the new host with contact information
+    // Insert the new host with username, hashed password, and phone number
     const result = await hosts.insertOne({
       username,
       password: hashedPassword,
-      contactInfo,
-      ...otherData,
+      phoneNumber,
     });
     const newHostId = result.insertedId;
 
@@ -350,7 +342,6 @@ app.post('/host/register', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while registering the host' });
   }
 });
-
 
 
 /**
