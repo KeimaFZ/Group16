@@ -120,6 +120,9 @@ run().catch(console.dir);
 let db;
 let Visitorregistration;
 let adminuser;
+let securities;
+let hosts;
+
 
 
 
@@ -133,6 +136,9 @@ client.connect()
   // Initialize collections after establishing the connection
   Visitorregistration = db.collection('visitors');
   adminuser = db.collection('admins');
+  securities = db.collection('securities'); // Add this line if you're using a 'securities' collection
+  hosts = db.collection('hosts'); // Add this line if you're using a 'hosts' collection
+
 
 
   // Now you can safely start your server here, after the DB connection is established
@@ -144,8 +150,8 @@ client.connect()
 
 // In-memory data storage (replace with a database in production)
 const visitors = [];
-const securities = [];
-const hosts = [];
+const securitiesData = [];
+const hostsData = [];
 
 app.use(express.json());
 
