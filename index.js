@@ -282,12 +282,22 @@ app.get('/login', (req, res) => {
  *             required:
  *               - username
  *               - password
+ *               - contactInfo
  *             properties:
  *               username:
  *                 type: string
  *               password:
  *                 type: string
- *               # Add other required properties here
+ *               contactInfo:
+ *                 type: object
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                   phone:
+ *                     type: string
+ *                   address:
+ *                     type: string
+ *                     # Add more contact info properties as needed
  *     responses:
  *       201:
  *         description: Host registered successfully
@@ -305,36 +315,42 @@ app.get('/login', (req, res) => {
  *       500:
  *         description: Error occurred while registering the host
  */
-~
 
 
- // Host registration endpoint
- app.post('/host/register', async (req, res) => {
-  const { username, password, ...otherData } = req.body;
+
+// Host registration endpoint
+app.post('/host/register', async (req, res) => {
+  const { username, password, contactInfo, ...otherData } = req.body;
 
   try {
-      // Check if the user already exists
-      const existingHost = await hosts.findOne({ username });
-      if (existingHost) {
-          return res.status(400).send('Host already exists');
-      }
+    // Check if the user already exists
+    const existingHost = await hosts.findOne({ username });
+    if (existingHost) {
+      return res.status(400).send('Host already exists');
+    }
 
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Insert the new host
-      const result = await hosts.insertOne({ username, password: hashedPassword, ...otherData });
-      const newHostId = result.insertedId;
+    // Insert the new host with contact information
+    const result = await hosts.insertOne({
+      username,
+      password: hashedPassword,
+      contactInfo,
+      ...otherData,
+    });
+    const newHostId = result.insertedId;
 
-      // Create a token
-      const token = jwt.sign({ userId: newHostId }, secret, { expiresIn: '1h' });
+    // Create a token
+    const token = jwt.sign({ userId: newHostId }, secret, { expiresIn: '1h' });
 
-      res.status(201).json({ message: 'Host registered successfully', accessToken: token });
+    res.status(201).json({ message: 'Host registered successfully', accessToken: token });
   } catch (error) {
-      console.error('Registration error:', error);
-      res.status(500).json({ error: 'An error occurred while registering the host' });
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'An error occurred while registering the host' });
   }
 });
+
 
 
 /**
