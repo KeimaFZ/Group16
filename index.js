@@ -144,7 +144,7 @@ client.connect()
 
 // In-memory data storage (replace with a database in production)
 const visitors = [];
-const admins = [];
+const securities = [];
 
 app.use(express.json());
 
@@ -165,10 +165,10 @@ app.set('views', path.join(__dirname, 'views'));
 
 /**
  * @swagger
- * /registeradmin:
+ * /security/register:
  *   post:
- *     summary: Register a new admin account
- *     tags: [Admin]
+ *     summary: Register a new security account
+ *     tags: [Security]
  *     requestBody:
  *       required: true
  *       content:
@@ -185,33 +185,35 @@ app.set('views', path.join(__dirname, 'views'));
  *                 type: string
  *     responses:
  *       201:
- *         description: Admin registered successfully
+ *         description: Security registered successfully
  *       400:
- *         description: Admin already exists
+ *         description: Security already exists
  */
 
 
-// Admin Register New Account
-app.post('/registeradmin', async (req, res) => {
-  const admins = db.collection('admins');
+
+// Scurity Register New Account
+app.post('/security/register', async (req, res) => {
+  const securities = db.collection('securities'); // Assuming a 'securities' collection
   const { username, password } = req.body;
 
-  const existingAdmin = await admins.findOne({ username });
-  if (existingAdmin) {
-    return res.status(400).json({ error: 'Admin already exists' });
+  const existingSecurity = await securities.findOne({ username });
+  if (existingSecurity) {
+    return res.status(400).json({ error: 'Security already exists' });
   }
 
-  await admins.insertOne({ username, password });
-  res.status(201).json({ message: 'Admin registered successfully' });
+  await securities.insertOne({ username, password });
+  res.status(201).json({ message: 'Security registered successfully' });
 });
+
 
 
 /**
  * @swagger
- * /login:
+ * /security/login:
  *   post:
- *     summary: Admin login
- *     tags: [Admin]
+ *     summary: Security login
+ *     tags: [Security]
  *     requestBody:
  *       required: true
  *       content:
@@ -228,28 +230,27 @@ app.post('/registeradmin', async (req, res) => {
  *                 type: string
  *     responses:
  *       200:
- *         description: Admin authenticated successfully
+ *         description: Security authenticated successfully
  *       401:
  *         description: Invalid username or password
  */
 
-
-// Admin Login
-app.post('/login', async (req, res) => {
-  const admins = db.collection('admins');
+// Security Login
+app.post('/security/login', async (req, res) => {
+  const securities = db.collection('securities'); // Assuming a 'securities' collection
   const { username, password } = req.body;
 
-  const admin = await admins.findOne({ username, password });
-  if (!admin) {
+  const security = await securities.findOne({ username, password });
+  if (!security) {
     return res.status(401).json({ error: 'Invalid username or password' });
   }
 
-  // Create token if the admin was found
-  const token = jwt.sign({ userId: admin._id }, secret, { expiresIn: '1h' });
+  // Create token if the security was found
+  const token = jwt.sign({ userId: security._id }, secret, { expiresIn: '1h' });
 
-  res.json({ message: 'Admin authenticated successfully', 
-  accessToken: token });
+  res.json({ message: 'Security authenticated successfully', accessToken: token });
 });
+
 
 
 // Existing route in your code
