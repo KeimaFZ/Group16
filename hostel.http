@@ -1,6 +1,6 @@
 // View Visitors
 GET http://localhost:4000/viewvisitor
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTk3ZmJhZDg5M2IyMzk2OGU1MDhiNTIiLCJpYXQiOjE3MDQ0NjA3MDYsImV4cCI6MTcwNDQ2NDMwNn0.wuYUHTIUNRgit5Z1FrqBZbHdeoF2HPcv5fDQSgjTfZM
 
 ###
 // Register Admin
@@ -8,8 +8,8 @@ POST http://localhost:4000/registeradmin
 Content-Type: application/json
 
 {
-    "username": "syahirah",
-    "password": 8877
+    "username": "yuki",
+    "password": 9000
 }
 
 ###
@@ -18,22 +18,23 @@ POST http://localhost:4000/login
 Content-Type: application/json
 
 {
-    "username": "syahirah",
-    "password": 8877
+    "username": "yuki",
+    "password": 9000
 }
 
 ###
 // Register a Visitor
 POST http://localhost:4000/registervisitor
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTk3ZmJhZDg5M2IyMzk2OGU1MDhiNTIiLCJpYXQiOjE3MDQ0NTkyMDUsImV4cCI6MTcwNDQ2MjgwNX0.6A_ZdBRMtRKKSTx2I5bnOPi3oflVD5xfJjFouvDFA1w
+
 {
-    "Name": "keima",
-    "Age": "24",
-    "Gender": "female",
-    "Address": "konoha",
-    "Zipcode": "34000",
-    "Relation": "balik umah"
+    "Name": "itto",
+    "Age": "23",
+    "Gender": "male",
+    "Address": "inazuma",
+    "Zipcode": "9898",
+    "Relation": "onikabuto fight"
 }
 
 
@@ -41,11 +42,11 @@ Authorization: Bearer
 //Admin issue visitor pass
 POST http://localhost:4000/issuevisitorpass
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTk3ZmJhZDg5M2IyMzk2OGU1MDhiNTIiLCJpYXQiOjE3MDQ0NjA3NTEsImV4cCI6MTcwNDQ2NDM1MX0.IDIQDVen_tBQCUSqUUw0Kc2t8-vmJ7SRerGKCa3O8FY
 
 {
-    "visitorId": "658aa47fb8cd40c4b34204b4",
-    "issuedBy": "syahirah",
+    "visitorId": "6597fc03893b23968e508b53",
+    "issuedBy": "yuki",
     "validUntil": "2023-12-31T23:59:59"
 }
 
@@ -54,7 +55,7 @@ Authorization: Bearer
 
 ###
 //Visitor to Retrieve Their Pass          //visitor ID
-GET http://localhost:4000/retrievepass/658aa47fb8cd40c4b34204b4
+GET http://localhost:4000/retrievepass/6597fc03893b23968e508b53
 
 
 

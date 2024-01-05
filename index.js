@@ -527,6 +527,117 @@ app.delete('/deletevisitor/:visitorId', verifyToken, async (req, res) => {
   }
 });
 
+// Manage account roles swagger
+/**
+ * @swagger
+ * /admin/manage-roles:
+ *   patch:
+ *     summary: Manage user roles
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               newRole:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User role updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error occurred while updating user role
+ */
+
+// Manage account roles
+app.patch('/admin/manage-roles', verifyToken, async (req, res) => {
+  const { userId, newRole } = req.body;
+
+  // Ensure the user performing the operation is an admin
+  if (!req.user.isAdmin) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const updateResult = await db.collection('users').updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { role: newRole } }
+    );
+
+    if (updateResult.matchedCount === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'User role updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while updating user role', details: error.toString() });
+  }
+});
+
+// Get host contact swagger
+/**
+ * @swagger
+ * /gethostcontact:
+ *   get:
+ *     summary: Retrieve host contact number using visitor pass ID
+ *     tags: [Security]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: visitorPassId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Visitor Pass ID to retrieve host contact
+ *     responses:
+ *       200:
+ *         description: Host contact number retrieved successfully
+ *       404:
+ *         description: No visitor pass found with this ID
+ *       500:
+ *         description: Error occurred while retrieving host contact number
+ */
+
+// Route to retrieve host contact number using visitor pass ID
+app.get('/gethostcontact', verifyToken, async (req, res) => {
+  const { visitorPassId } = req.query;
+
+  try {
+    // Assuming you have a collection that associates visitor passes with hosts
+    const visitorPasses = db.collection('visitorpasses');
+    const passInfo = await visitorPasses.findOne({ _id: new ObjectId(visitorPassId) });
+
+    if (!passInfo) {
+      return res.status(404).json({ error: 'No visitor pass found with this ID' });
+    }
+
+    // Assuming you have a host's contact number stored in a 'hosts' collection
+    const hosts = db.collection('hosts');
+    const hostInfo = await hosts.findOne({ _id: new ObjectId(passInfo.hostId) });
+
+    if (!hostInfo) {
+      return res.status(404).json({ error: 'No host found for this visitor pass' });
+    }
+
+    // Sending back only the contact number as specified in the requirement
+    res.json({ contactNumber: hostInfo.contactNumber });
+  } catch (error) {
+    console.error('Get Host Contact Error:', error.message);
+    res.status(500).json({ error: 'An error occurred while retrieving host contact number', details: error.message });
+  }
+});
+
+
 /**
  * @swagger
  * components:
