@@ -268,12 +268,11 @@ app.get('/login', (req, res) => {
 
 /**
  * @swagger
- * /hosts/register:
+ * /host/register:
  *   post:
  *     summary: Register a new host
- *     tags: [Host]
- *     security:
- *       - bearerAuth: []
+ *     tags: 
+ *       - Host
  *     requestBody:
  *       required: true
  *       content:
@@ -281,40 +280,122 @@ app.get('/login', (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - name
- *               - location
- *               - contactInfo
+ *               - username
+ *               - password
  *             properties:
- *               name:
+ *               username:
  *                 type: string
- *               location:
+ *               password:
  *                 type: string
- *               contactInfo:
- *                 type: string
+ *               # Add other required properties here
  *     responses:
  *       201:
  *         description: Host registered successfully
- *       401:
- *         description: Unauthorized, token not provided or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 accessToken:
+ *                   type: string
+ *       400:
+ *         description: Host already exists or missing required fields
  *       500:
  *         description: Error occurred while registering the host
  */
+~
 
-// Endpoint to register a new host
-app.post('/hosts/register', verifyToken, async (req, res) => {
+
+ // Host registration endpoint
+ app.post('/host/register', async (req, res) => {
+  const { username, password, ...otherData } = req.body;
+
   try {
-    // Check if the request has necessary data (name, location, contactInfo)
-    const { name, location, contactInfo } = req.body;
-    if (!name || !location || !contactInfo) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-    const result = await db.collection('hosts').insertOne({ name, location, contactInfo });
-    res.status(201).json({ message: 'Host registered successfully' });
+      // Check if the user already exists
+      const existingHost = await hosts.findOne({ username });
+      if (existingHost) {
+          return res.status(400).send('Host already exists');
+      }
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Insert the new host
+      const result = await hosts.insertOne({ username, password: hashedPassword, ...otherData });
+      const newHostId = result.insertedId;
+
+      // Create a token
+      const token = jwt.sign({ userId: newHostId }, secret, { expiresIn: '1h' });
+
+      res.status(201).json({ message: 'Host registered successfully', accessToken: token });
   } catch (error) {
-    console.error('Error registering host:', error);
-    res.status(500).json({ error: 'An error occurred while registering the host' });
+      console.error('Registration error:', error);
+      res.status(500).json({ error: 'An error occurred while registering the host' });
   }
 });
+
+/**
+ * @swagger
+ * /host/login:
+ *   post:
+ *     summary: Host login
+ *     tags: [Host]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Host authenticated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 accessToken:
+ *                   type: string
+ *       401:
+ *         description: Invalid username or password
+ *       500:
+ *         description: Error occurred while logging in
+ */
+
+
+    // Host login endpoint
+    app.post('/host/login', async (req, res) => {
+      const { username, password } = req.body;
+
+      try {
+          // Find host with the given username
+          const host = await hosts.findOne({ username });
+
+          if (!host || host.password !== password) {
+              return res.status(401).send('Invalid username or password');
+          }
+
+          // Create a token
+          const token = jwt.sign({ userId: host._id }, secret, { expiresIn: '1h' });
+
+          res.json({ message: 'Host authenticated successfully', accessToken: token });
+      } catch (error) {
+          console.error('Login error:', error);
+          res.status(500).json({ error: 'An error occurred while logging in' });
+      }
+  });
 
 /**
  * @swagger
