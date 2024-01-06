@@ -174,10 +174,70 @@ app.set('views', path.join(__dirname, 'views'));
 
 /**
  * @swagger
- * /security/register:
+ * /admin/register:
  *   post:
- *     summary: Register a new security account
- *     tags: [Security]
+ *     summary: Register a new admin
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *               - contactNumber
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               contactNumber:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Admin registered successfully
+ *       400:
+ *         description: Admin already exists
+ *       500:
+ *         description: Error occurred while registering the admin
+ */
+
+
+// Admin registration endpoint without password hashing
+app.post('/admin/register', async (req, res) => {
+  const admins = db.collection('admins'); // Assuming a 'admins' collection
+  const { username, password, contactNumber } = req.body;
+
+  try {
+    // Check if the admin already exists
+    const existingAdmin = await admins.findOne({ username });
+    if (existingAdmin) {
+      return res.status(400).json({ error: 'Admin already exists' });
+    }
+
+    // Insert the new admin
+    await admins.insertOne({
+      username,
+      password,
+      contactNumber
+    });
+
+    res.status(201).json({ message: 'Admin registered successfully' });
+  } catch (error) {
+    console.error('Admin registration error:', error);
+    res.status(500).json({ error: 'An error occurred while registering the admin' });
+  }
+});
+
+
+/**
+ * @swagger
+ * /admin/login:
+ *   post:
+ *     summary: Admin login
+ *     tags: [Admin]
  *     requestBody:
  *       required: true
  *       content:
@@ -193,10 +253,132 @@ app.set('views', path.join(__dirname, 'views'));
  *               password:
  *                 type: string
  *     responses:
+ *       200:
+ *         description: Admin authenticated successfully
+ *       401:
+ *         description: Invalid username or password
+ *       500:
+ *         description: Error occurred while logging in
+ */
+
+
+// Admin login endpoint without password hashing
+app.post('/admin/login', async (req, res) => {
+  const admins = db.collection('admins'); // Assuming a 'admins' collection
+  const { username, password } = req.body;
+
+  try {
+    const admin = await admins.findOne({ username, password });
+    if (!admin) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    // Create token
+    const token = jwt.sign({ userId: admin._id, isAdmin: true }, secret, { expiresIn: '1h' });
+    res.json({ message: 'Admin authenticated successfully', accessToken: token });
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({ error: 'An error occurred while logging in' });
+  }
+});
+
+
+/**
+ * @swagger
+ * /admin/update-contact:
+ *   patch:
+ *     summary: Update contact number for hosts and securities
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - newContactNumber
+ *               - userType
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               newContactNumber:
+ *                 type: string
+ *               userType:
+ *                 type: string
+ *                 enum: [host, security]
+ *     responses:
+ *       200:
+ *         description: Contact number updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error occurred while updating contact number
+ */
+
+// Update contact number for hosts and securities
+app.patch('/admin/update-contact', verifyToken, async (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const { userId, newContactNumber, userType } = req.body;
+  const collection = userType === 'host' ? hosts : securities;
+
+  try {
+    const updateResult = await db.collection(collection).updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { contactNumber: newContactNumber } }
+    );
+
+    if (updateResult.matchedCount === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'Contact number updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while updating contact number', details: error.toString() });
+  }
+});
+
+
+
+
+
+/**
+ * @swagger
+ * /security/register:
+ *   post:
+ *     summary: Register a new security account
+ *     tags: [Security]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *               - contactNumber
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               contactNumber:
+ *                 type: string
+ *     responses:
  *       201:
  *         description: Security registered successfully
  *       400:
  *         description: Security already exists
+ *       500:
+ *         description: Error occurred while registering the security
  */
 
 
@@ -204,17 +386,17 @@ app.set('views', path.join(__dirname, 'views'));
 // Scurity Register New Account
 app.post('/security/register', async (req, res) => {
   const securities = db.collection('securities'); // Assuming a 'securities' collection
-  const { username, password } = req.body;
+  const { username, password, contactNumber } = req.body;
 
   const existingSecurity = await securities.findOne({ username });
   if (existingSecurity) {
     return res.status(400).json({ error: 'Security already exists' });
   }
 
-  await securities.insertOne({ username, password });
+  // No password hashing as per your requirement
+  await securities.insertOne({ username, password, contactNumber });
   res.status(201).json({ message: 'Security registered successfully' });
 });
-
 
 
 /**
