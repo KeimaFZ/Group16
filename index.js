@@ -466,13 +466,13 @@ app.get('/login', (req, res) => {
  *             required:
  *               - username
  *               - password
- *               - phoneNumber
+ *               - contactNumber
  *             properties:
  *               username:
  *                 type: string
  *               password:
  *                 type: string
- *               phoneNumber:
+ *               contactNumber:
  *                 type: string
  *                 description: Phone number of the host
  *     responses:
@@ -495,10 +495,10 @@ app.get('/login', (req, res) => {
 
 
 
-// Host registration endpoint
+// Host registration endpoint without password hashing
 app.post('/host/register', async (req, res) => {
   const hosts = db.collection('hosts');
-  const { username, password, phoneNumber } = req.body;
+  const { username, password, contactNumber } = req.body;
 
   try {
     // Check if the user already exists
@@ -507,13 +507,10 @@ app.post('/host/register', async (req, res) => {
       return res.status(400).send('Host already exists');
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Insert the new host with username, hashed password, and phone number
+    // Store the password as received, without hashing
     const result = await hosts.insertOne({
       username,
-      password: hashedPassword,
+      password, // Storing the password as is, without hashing
       phoneNumber,
     });
     const newHostId = result.insertedId;
@@ -527,6 +524,7 @@ app.post('/host/register', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while registering the host' });
   }
 });
+
 
 
 /**
