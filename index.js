@@ -474,7 +474,7 @@ app.get('/login', (req, res) => {
  *                 type: string
  *               contactNumber:
  *                 type: string
- *                 description: Phone number of the host
+ *                 description: Contact number of the host
  *     responses:
  *       201:
  *         description: Host registered successfully
@@ -511,7 +511,7 @@ app.post('/host/register', async (req, res) => {
     const result = await hosts.insertOne({
       username,
       password, // Storing the password as is, without hashing
-      phoneNumber,
+      contactNumber,
     });
     const newHostId = result.insertedId;
 
